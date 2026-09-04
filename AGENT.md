@@ -1,6 +1,7 @@
 # Contract for the daily run
 
-You are the research half. Claude built the site; you only ever write **one file**:
+You are the research half, running unattended as a scheduled agent at **06:00
+Sydney (20:00 UTC)**. You only ever write **one file**:
 
 ```
 days/YYYY-MM-DD.md
@@ -9,13 +10,46 @@ days/YYYY-MM-DD.md
 Do not touch `build.py`, `assets/`, `index.html`, or anything under `.github/`.
 A bad research run must not be able to break the site.
 
+**Use the Sydney date, not UTC.** You run at 20:00 UTC, which is already tomorrow
+in Sydney — the file for a run starting 20:00 UTC on the 5th is `2026-09-06.md`.
+Get this wrong and you overwrite yesterday's page.
+
 ## Steps
 
 1. Read `config/follow.yml` — people first, then topics, in that order. It carries a
-   `feed:` for most entries so you are not rediscovering sources every morning.
-2. Find what is new since the previous day file in `days/`. Nothing older than that.
-3. Write `days/<today>.md` in the format below.
+   `feed:` for most entries so you are not rediscovering sources every morning, and a
+   `search:` hint for finding news *about* people who publish rarely.
+2. For each person, run the two passes described below. Cover the window since the
+   previous day file in `days/`; on a normal daily run that is about 24 hours, but
+   because you run at Sydney dawn you are mostly catching the *previous* US working
+   day. Do not exclude something for being dated "yesterday" in US time — that is
+   the expected case, not a stale item.
+3. Write `days/<today Sydney>.md` in the format below.
 4. Commit and push to `main`. The Action rebuilds and deploys; you do not run the build.
+
+## Two passes per person
+
+**Pass one — their own output.** Their feed, blog, releases, channel. This leads the
+section. A person's own work always outranks coverage of it.
+
+**Pass two — news about them.** Only run this when pass one found nothing, or found
+fewer than two items. Search for what has been written about them, what they have
+been quoted in, what they shipped that someone else covered, interviews, podcast
+appearances, funding or legal news. `config/follow.yml` carries a `search:` hint per
+person to start from; do not treat it as the only query.
+
+This exists because feed-only coverage leaves sections empty for months at a time —
+Karpathy has not uploaded since February 2025 — while the person is still active and
+being written about. An empty section for someone genuinely quiet is correct; an
+empty section for someone who was on a podcast yesterday is a miss.
+
+**Rank primary over secondary.** If someone published a post *and* was written about,
+lead with the post. Mark secondary items plainly in the source field: use the
+publication, not the person — `(techcrunch, 2026-08-31)`, not `(news, ...)`.
+
+**Do not let pass two inflate the page.** If a search turns up nothing but SEO
+listicles, recycled profiles, or "top 10 AI thinkers" filler, that person had nothing.
+Say nothing rather than pad. Secondary coverage has to carry actual news.
 
 ## Format
 
@@ -98,7 +132,9 @@ category, not information. Write what the piece actually claims:
   no empty section. Do not pad.
 - **Every item needs a source and a date** in the parenthetical, in that order:
   `(source, YYYY-MM-DD)`. The build renders it as `BLOG · 3 SEP`.
-- **Cap at roughly 4 items per person** so one high-volume blog cannot swamp the page.
+- **Cap at 4 items per person**, and spend that budget on the best four, not the
+  first four. Tyler Cowen alone can produce a dozen posts a day; picking is the job.
+  The cap counts both passes together.
 - **An empty day is fine.** Write the file with frontmatter and no sections. The page
   renders "Nothing new on the list today." Honest beats padded.
 - **No run at all is also survivable** — the site keeps showing the newest day with a

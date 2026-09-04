@@ -1,87 +1,47 @@
-# Handover prompt for the research agent
+# The daily run
 
-Paste the block below into Antigravity (or Gemini) with this folder open. The
-contract it refers to is [AGENT.md](AGENT.md).
+The briefing is produced by a **scheduled Claude Code cloud agent**, not by hand.
 
----
+- **Fires**: 06:00 Sydney / 20:00 UTC, daily.
+- **Writes**: `days/YYYY-MM-DD.md` (Sydney date), commits, pushes to `main`.
+- **Then**: GitHub Actions builds and deploys. A fallback rebuild runs 21:30 UTC so
+  the stale banner appears the same morning if the run did not land.
+
+The contract it works to is [AGENT.md](AGENT.md). That is the single source of truth
+— the routine's prompt deliberately does not restate it, so there is only one place
+to edit when the rules change.
+
+## The routine's prompt
 
 ```
-You are the research half of a daily briefing site. It is already built,
-deployed and working — https://jonnyrizla.github.io/morning/ — and your job
-is the daily content run, nothing else.
+Produce today's daily briefing for this repo.
 
-Read AGENT.md first. It is the contract and it is short. Then read
-config/follow.yml, which lists the 15 people and the topics, in page order.
+Read AGENT.md first and follow it exactly — it is the contract and it covers the
+file format, the two research passes, the summary standard and the permalink rule.
+Then read config/follow.yml for the people, topics, feeds and search hints.
 
-Your entire output is ONE file: days/YYYY-MM-DD.md for today's date.
+Write days/<today's Sydney date>.md, commit, and push to main. You run at 20:00 UTC,
+which is already tomorrow in Sydney, so take the date from Sydney time — using the
+UTC date will overwrite yesterday's page.
 
-Do not touch build.py, assets/, config/, README.md, SPEC.md, AGENT.md, or
-anything under .github/. There is no build step for you to run — push to
-main and GitHub Actions builds and deploys. The site is a dumb renderer of
-the file you drop in days/, and that separation is the point: a bad research
-run must not be able to break the page.
+Do not modify anything outside days/. If a feed is dead or a rule in follow.yml looks
+wrong, note it in the run summary rather than editing the file yourself.
 
-Today's run:
-
-1. Work the people in config/follow.yml in order, then the topics.
-2. For each, find what is genuinely new since the previous file in days/.
-   On this first run there is no previous file — use a 2-day window.
-3. Write days/<today>.md in exactly the format in AGENT.md:
-
-   ---
-   date: YYYY-MM-DD
-   generated_by: antigravity
-   ---
-
-   ## Simon Willison
-   - **Title of the thing** (blog, 2026-09-03) [link](https://real.url/permalink)
-     First paragraph: what the piece actually says.
-
-     Second paragraph: why it matters here.
-
-4. Commit and push to main.
-
-Rules that matter, in order of how badly breaking them hurts:
-
-- Every item needs a real, working link and a real date. Never invent an
-  item, a title, a date or a URL. If you cannot verify it, leave it out.
-- SUMMARIES ARE THE POINT. 100-180 words, usually two paragraphs. Lead with
-  the actual claim, number, mechanism or version — not a description of the
-  topic. "A reflection on economic growth metrics" is exactly the failure:
-  it is a category, not information. Read AGENT.md's summary section in full
-  before writing any of them; it has a worked before/after example.
-- Link permalinks, not index pages. A commit SHA, a PR number, a dated post
-  URL, a tagged release. Never /blog, /latest, or a rolling release-notes
-  page — see the permalink section in AGENT.md.
-- Skip anyone with nothing new. No heading, no empty section, no padding.
-  A short honest page is the goal; a long padded one is a failure.
-- People sections first, then topics. Topic headings MUST start with
-  "Topic:" — that is what tags them on the page.
-- Source and date go in the parenthetical in that order: (source, YYYY-MM-DD).
-- Cap at roughly 4 items per person so one high-volume blog (Tyler Cowen,
-  Marginal Revolution) cannot swamp the page.
-- An empty day is a legitimate result. Write the file with frontmatter and no
-  sections; the page renders "Nothing new on the list today." Always prefer an
-  empty day file to no file at all.
-
-Two known gaps, so you are not surprised by them:
-- X/Twitter has no usable feed. Search rather than subscribe, and accept that
-  some X output is missed. Do not fabricate to fill it.
-- The follow list has one unresolved entry: an unnamed YouTube channel about
-  learning. Ignore it until it is named in config/follow.yml.
-
-config/follow.yml carries a feed: for most entries. Some are marked
-UNVERIFIED — fetch them as you go and report which ones 404. Do not edit the
-file yourself; report and let me decide.
-
-When you are done, tell me how many items you found, who had nothing, and
-anything in config/follow.yml that looks wrong or unreachable.
+Finish with a short report: item count, who had nothing, which sections came from the
+news-about-them pass rather than their own output, and anything in follow.yml that
+needs fixing.
 ```
 
----
+## Changing it
 
-## For later runs
+- **Rules, format, summary standard** → edit `AGENT.md`. No need to touch the routine.
+- **Who and what is followed** → edit `config/follow.yml`.
+- **Time, or the prompt above** → `/schedule` in Claude Code, then pick this routine.
+- **Pausing** → disable the routine; the site keeps serving the newest day with a
+  visible stale banner, which is the designed failure mode.
 
-The prompt above works unchanged every day — step 2 picks up the previous day
-file on its own once one exists. The only line worth editing is the first-run
-note about the 2-day window, which becomes redundant after day one.
+## If a morning is missed
+
+Nothing breaks. The page shows the most recent day with "No run has landed for today
+— this is N days old". To fill a gap by hand, run the prompt above in a normal
+session; there is nothing special about the scheduled context.

@@ -2,13 +2,18 @@
 # the research agent does. Order here is the order on the page.
 #
 # `feed:` saves the agent rediscovering sources every morning. Entries marked
-# UNVERIFIED have not been fetched by anyone yet — on
-# the next run, check each one and report any that 404 so this file can be
-# corrected. Entries marked CHECKED were fetched successfully on the date given.
+# UNVERIFIED have not been fetched by anyone yet: check them on the next run and
+# report any that 404 so this file can be corrected. Entries marked CHECKED were
+# fetched successfully on the date given.
+#
+# `search:` is the starting query for the news-about-them pass, which runs only
+# when someone has published little or nothing themselves. It is a hint, not the
+# only query worth trying.
 
 people:
   - name: Andrej Karpathy
     why: Founding OpenAI, ex-Tesla AI, the canonical teaching source
+    search: "Andrej Karpathy" talk OR interview OR essay OR nanochat
     where: [youtube, x]
     feed: https://www.youtube.com/feeds/videos.xml?channel_id=UCXUPKJO5MZQN11PqgIvyuvQ
     # CHECKED 2026-09-05 — feed fetched, returns the Andrej Karpathy channel.
@@ -19,12 +24,14 @@ people:
 
   - name: Simon Willison
     why: Co-created Django, builds Datasette and the `llm` CLI; best running commentary on LLM tooling
+    search: "Simon Willison" LLM tooling OR datasette OR quoted
     where: [blog, x]
     feed: https://simonwillison.net/atom/everything/
     # CHECKED 2026-09-05
 
   - name: Boris Cherny
     why: Created Claude Code, the tool the vault runs on
+    search: "Boris Cherny" OR "Claude Code" release OR interview
     where: [release-notes, x]
     feed: https://registry.npmjs.org/@anthropic-ai/claude-code
     # CHECKED 2026-09-04 — npm gives timestamped versions; the `time` object is
@@ -38,12 +45,14 @@ people:
 
   - name: David Heinemeier Hansson
     why: Created Rails, 37signals CTO; cloud repatriation and anti-complexity
+    search: "DHH" OR "Heinemeier Hansson" Rails OR 37signals OR cloud exit
     where: [blog, x]
     feed: https://world.hey.com/dhh/feed.atom
     # CHECKED 2026-09-05
 
   - name: Mitchell Hashimoto
     why: Ghostty; before that Terraform, Vault, Consul, Vagrant
+    search: "Mitchell Hashimoto" Ghostty OR Superlogical OR talk
     where: [blog, x]
     feed: https://mitchellh.com/feed.xml
     # CHECKED 2026-09-05 — works, but carries metadata only, no post
@@ -53,6 +62,7 @@ people:
 
   - name: Matt Pocock
     why: Agent skills, TypeScript education
+    search: "Matt Pocock" agent skills OR TypeScript course OR AI Hero
     where: [github, x, youtube]
     feed: https://github.com/mattpocock/skills/commits/main.atom
     # CHECKED 2026-09-04 — https://www.mattpocock.com/feed.xml is DEAD (404).
@@ -60,6 +70,7 @@ people:
 
   - name: Addy Osmani
     why: Chrome engineering leader, writes on AI-assisted engineering
+    search: "Addy Osmani" AI-assisted engineering OR Chrome OR talk
     where: [blog, x, newsletter]
     feed: https://addyosmani.com/rss.xml
     # CHECKED 2026-09-05 — works, but carries metadata and a one-line
@@ -67,6 +78,7 @@ people:
 
   - name: Andrew Ng
     why: Stanford, DeepLearning.AI, Google Brain founder
+    search: "Andrew Ng" DeepLearning.AI OR The Batch OR interview
     where: [newsletter, x, linkedin]
     feed: https://www.deeplearning.ai/the-batch/
     # CHECKED 2026-09-05 — not a feed, and the index gives only issue
@@ -75,12 +87,14 @@ people:
 
   - name: Armin Ronacher
     why: Created Flask, Jinja2, Click; now Rust tooling; language design
+    search: "Armin Ronacher" Rust OR agent tooling OR talk
     where: [blog, x]
     feed: https://lucumr.pocoo.org/feed.atom
     # CHECKED 2026-09-05
 
   - name: Daniel Chalef
     why: Zep and Graphiti, temporal knowledge graphs
+    search: "Daniel Chalef" OR Zep OR Graphiti agent memory
     where: [blog, github]
     feed: https://blog.getzep.com/rss/
     # CHECKED 2026-09-05 — full bodies, good source. Graphiti releases are
@@ -90,6 +104,7 @@ people:
 
   - name: Tyler Cowen
     why: Marginal Revolution, several posts a day, plus Conversations with Tyler
+    search: "Tyler Cowen" Conversations with Tyler OR column OR interview
     where: [blog, podcast]
     feed: https://marginalrevolution.com/feed
     # CHECKED 2026-09-05 — full bodies. Highest volume on the list, so the
@@ -97,12 +112,14 @@ people:
 
   - name: Robin Hanson
     why: Prediction market theory, Overcoming Bias
+    search: "Robin Hanson" prediction markets OR futarchy OR interview
     where: [blog]
     feed: https://www.overcomingbias.com/feed
     # CHECKED 2026-09-05
 
   - name: Scott Alexander
     why: Astral Codex Ten, long-form on rationalism, AI, social science
+    search: "Scott Alexander" Astral Codex Ten OR ACX OR interview
     where: [blog]
     feed: https://www.astralcodexten.com/feed
     # CHECKED 2026-09-05 — returns only the single newest post, so it cannot
@@ -110,6 +127,7 @@ people:
 
   - name: Shayne Coplan
     why: Founder of Polymarket, and the legal fight around prediction markets
+    search: "Shayne Coplan" OR Polymarket funding OR CFTC OR regulation
     where: [x, interviews]
     feed: null
     # No feed exists. Search only; expect frequent empty results.
@@ -137,12 +155,17 @@ topics:
     # No good feed. Search only.
 
 rules:
-  # Nothing older than the previous run's date.
+  # Nothing older than the previous day file. The run fires 06:00 Sydney /
+  # 20:00 UTC, so it is mostly catching the PREVIOUS US working day — a US date
+  # of "yesterday" is the normal case, not a stale item.
   max_age_days: 2
   # Skip anyone with nothing new. Do not pad.
   skip_empty: true
-  # Rough ceiling per person so one high-volume blog cannot swamp the page.
+  # Hard ceiling per person, counting both the own-output and news-about passes.
+  # Spend it on the best four, not the first four.
   max_items_per_person: 4
+  # Pass two (news about a person) runs only when pass one found fewer than two.
+  news_about_threshold: 2
 
 unresolved:
   # An open slot from the original follow list: a YouTube channel about

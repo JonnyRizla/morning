@@ -3,10 +3,11 @@ name: Build and deploy briefing
 on:
   push:
     branches: [main]
-  # Rebuild each morning even if no run landed, so the stale banner's
-  # day count stays honest.
+  # Fallback rebuild 90 minutes after the 20:00 UTC research run, so that if
+  # the run did not land the stale banner appears while it is still morning in
+  # Sydney rather than a day later.
   schedule:
-    - cron: "30 7 * * *"
+    - cron: "30 21 * * *"
   workflow_dispatch:
 
 permissions:

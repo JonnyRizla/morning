@@ -14,7 +14,14 @@ import os
 import re
 import shutil
 import sys
-from datetime import date, datetime, timezone
+from datetime import datetime, timedelta, timezone
+
+# Day files are stamped in the reader's local date (Sydney), but the build runs
+# on a UTC machine ten hours behind. Comparing against UTC "today" would leave a
+# missed run looking fresh until mid-afternoon, so staleness is measured here.
+# AEST is used year-round; the one-hour AEDT drift cannot change a date except
+# in the last hour before midnight, which does not matter for a day counter.
+LOCAL_TZ = timezone(timedelta(hours=10))
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 DAYS_DIR = os.path.join(ROOT, "days")
@@ -230,7 +237,7 @@ def short_date(text):
 
 def days_ago(slug):
     d = parse_slug(slug)
-    return None if d is None else (date.today() - d).days
+    return None if d is None else (datetime.now(LOCAL_TZ).date() - d).days
 
 
 def dispatch_line(source):
@@ -404,7 +411,7 @@ def build():
               encoding="utf-8") as fh:
         fh.write(page("Briefing Archive", render_archive(days), depth=1))
 
-    stamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    stamp = datetime.now(LOCAL_TZ).strftime("%Y-%m-%d %H:%M Sydney")
     print("built {} day(s) -> {}  [{}]".format(len(days), OUT_DIR, stamp))
     if newest:
         print("newest: {} ({} items)".format(newest["slug"], newest["count"]))
