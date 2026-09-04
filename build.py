@@ -113,9 +113,14 @@ def parse_item(head):
 
 
 def parse_body(body):
-    """Body -> [{'title', 'items': [{'head','note'}], 'prose': [...]}]."""
+    """Body -> [{'title', 'items': [{'head','notes'}], 'prose': [...]}].
+
+    An item's note is indented under its bullet. A blank line inside that
+    indented block starts a new paragraph, so a long summary can breathe.
+    """
     sections = []
     state = {"current": None, "item": None}
+    blank = False
 
     def new_section(title):
         sec = {"title": title, "items": [], "prose": []}
@@ -132,7 +137,10 @@ def parse_body(body):
     for raw in body.splitlines():
         line = raw.rstrip()
         if not line.strip():
+            blank = True
             continue
+        was_blank, blank = blank, False
+
         if line.startswith("## "):
             flush_item()
             new_section(line[3:].strip())
@@ -148,11 +156,15 @@ def parse_body(body):
             flush_item()
             if state["current"] is None:
                 new_section("")
-            state["item"] = {"head": stripped[2:].strip(), "note": ""}
+            state["item"] = {"head": stripped[2:].strip(), "notes": []}
             continue
         if state["item"] is not None and indented:
             note = stripped[2:].strip() if bullet else stripped
-            state["item"]["note"] = (state["item"]["note"] + " " + note).strip()
+            notes = state["item"]["notes"]
+            if was_blank or not notes:
+                notes.append(note)
+            else:
+                notes[-1] = (notes[-1] + " " + note).strip()
             continue
 
         flush_item()
@@ -294,8 +306,8 @@ def render_sections(sections):
                 if line:
                     parts.append('<p class="dispatch">{}</p>'.format(
                         html.escape(line, quote=False)))
-                if it["note"]:
-                    parts.append('<p class="note">{}</p>'.format(inline(it["note"])))
+                for para in it["notes"]:
+                    parts.append('<p class="note">{}</p>'.format(inline(para)))
                 parts.append("</li>")
             parts.append("</ul>")
         parts.append("</section>")

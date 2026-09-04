@@ -34,12 +34,10 @@ Today's run:
    ---
 
    ## Simon Willison
-   - **Title of the thing** (blog, 2026-09-03) [link](https://real.url/here)
-     One or two sentences on what it is and why it matters.
+   - **Title of the thing** (blog, 2026-09-03) [link](https://real.url/permalink)
+     First paragraph: what the piece actually says.
 
-   ## Topic: agent harnesses
-   - **Title** (github, 2026-09-04) [link](https://real.url/here)
-     One or two sentences.
+     Second paragraph: why it matters here.
 
 4. Commit and push to main.
 
@@ -47,6 +45,14 @@ Rules that matter, in order of how badly breaking them hurts:
 
 - Every item needs a real, working link and a real date. Never invent an
   item, a title, a date or a URL. If you cannot verify it, leave it out.
+- SUMMARIES ARE THE POINT. 100-180 words, usually two paragraphs. Lead with
+  the actual claim, number, mechanism or version — not a description of the
+  topic. "A reflection on economic growth metrics" is exactly the failure:
+  it is a category, not information. Read AGENT.md's summary section in full
+  before writing any of them; it has a worked before/after example.
+- Link permalinks, not index pages. A commit SHA, a PR number, a dated post
+  URL, a tagged release. Never /blog, /latest, or a rolling release-notes
+  page — see the permalink section in AGENT.md.
 - Skip anyone with nothing new. No heading, no empty section, no padding.
   A short honest page is the goal; a long padded one is a failure.
 - People sections first, then topics. Topic headings MUST start with
@@ -63,6 +69,10 @@ Two known gaps, so you are not surprised by them:
   some X output is missed. Do not fabricate to fill it.
 - The follow list has one unresolved entry: an unnamed YouTube channel about
   learning. Ignore it until it is named in config/follow.yml.
+
+config/follow.yml carries a feed: for most entries. Some are marked
+UNVERIFIED — fetch them as you go and report which ones 404. Do not edit the
+file yourself; report and let me decide.
 
 When you are done, tell me how many items you found, who had nothing, and
 anything in config/follow.yml that looks wrong or unreachable.

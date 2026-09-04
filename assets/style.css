@@ -200,7 +200,7 @@ ul {
 }
 
 li {
-  padding: 0.85rem 0;
+  padding: 1.15rem 0;
   border-top: 1px solid var(--rule-soft);
 }
 
@@ -242,12 +242,17 @@ li:first-child {
   color: var(--muted);
 }
 
+/* The summary is the read, not a caption — give it body-copy treatment. */
 .note {
-  margin: 0.45rem 0 0;
-  font-size: 0.945rem;
-  line-height: 1.58;
+  margin: 0.5rem 0 0;
+  font-size: 0.975rem;
+  line-height: 1.65;
   color: var(--ink-2);
   text-wrap: pretty;
+}
+
+.note + .note {
+  margin-top: 0.7rem;
 }
 
 p {
