@@ -1,0 +1,61 @@
+# Drives the whole daily run. Hand-edited; the build does not read this,
+# the research agent does. Order here is the order on the page.
+
+people:
+  - name: Andrej Karpathy
+    why: Founding OpenAI, ex-Tesla AI, the canonical teaching source
+    where: [youtube, x]
+  - name: Simon Willison
+    why: Co-created Django, builds Datasette and the `llm` CLI; best running commentary on LLM tooling
+    where: [blog, x]
+    feed: https://simonwillison.net/atom/everything/
+  - name: Boris Cherny
+    why: Created Claude Code, the tool the vault runs on
+    where: [x, release-notes]
+  - name: David Heinemeier Hansson
+    why: Created Rails, 37signals CTO; cloud repatriation and anti-complexity
+    where: [blog, x]
+  - name: Mitchell Hashimoto
+    why: Ghostty; before that Terraform, Vault, Consul, Vagrant
+    where: [blog, x]
+  - name: Matt Pocock
+    why: Agent skills, TypeScript education
+    where: [x, youtube, blog]
+  - name: Addy Osmani
+    why: Chrome engineering leader, writes on AI-assisted engineering
+    where: [x, blog, newsletter]
+  - name: Andrew Ng
+    why: Stanford, DeepLearning.AI, Google Brain founder
+    where: [newsletter, x, linkedin]
+  - name: Armin Ronacher
+    why: Created Flask, Jinja2, Click; now Rust tooling; language design
+    where: [blog, x]
+  - name: Daniel Chalef
+    why: Zep and Graphiti, temporal knowledge graphs
+    where: [blog, github]
+  - name: Tyler Cowen
+    why: Marginal Revolution, several posts a day, plus Conversations with Tyler
+    where: [blog, podcast]
+  - name: Robin Hanson
+    why: Prediction market theory, Overcoming Bias
+    where: [blog]
+  - name: Scott Alexander
+    why: Astral Codex Ten, long-form on rationalism, AI, social science
+    where: [blog]
+  - name: Shayne Coplan
+    why: Founder of Polymarket, and the legal fight around prediction markets
+    where: [x, interviews]
+
+topics:
+  - AI agents, harnesses and tooling (Claude Code, MCP, agent skills)
+  - Knowledge graphs, GraphRAG, temporal graphs
+  - Personal knowledge bases and local-first tools
+  - Prediction markets (Polymarket)
+
+rules:
+  # Nothing older than the previous run's date.
+  max_age_days: 2
+  # Skip anyone with nothing new. Do not pad.
+  skip_empty: true
+  # Rough ceiling per person so one high-volume blog cannot swamp the page.
+  max_items_per_person: 4
